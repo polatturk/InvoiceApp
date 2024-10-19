@@ -1,14 +1,15 @@
 ﻿namespace InvoiceApp.Models
 {
-    public class User
+    public class Customer
     {
         public int Id { get; set; }
         public string AdSoyad { get; set; }
-        public string Eposta { get; set; }
+        public string EPosta { get; set; }
         public string Adres { get; set; }
-        public string City { get; set; }
-        public int Kod { get; set; }
+        public string Sehir { get; set; }
         public string Ulke { get; set; }
-        public List<Customer> Customers { get; set; }
+        public int kod { get; set; }
+        public User Users { get; set; }
+
     }
 }
