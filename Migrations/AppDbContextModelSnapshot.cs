@@ -30,35 +30,35 @@ namespace InvoiceApp.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("AdSoyad")
+                    b.Property<string>("Address")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Adres")
+                    b.Property<string>("City")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("EPosta")
+                    b.Property<string>("Country")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Sehir")
+                    b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Ulke")
+                    b.Property<string>("FullName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("UsersId")
+                    b.Property<int>("PostCode")
                         .HasColumnType("int");
 
-                    b.Property<int>("kod")
+                    b.Property<int>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UsersId");
+                    b.HasIndex("UserId");
 
                     b.ToTable("Customers");
                 });
@@ -71,56 +71,59 @@ namespace InvoiceApp.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("CustomersId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("OdemeDurumu")
-                        .HasColumnType("int");
-
-                    b.Property<int>("OdemeVadesi")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("OlusturmaTarihi")
+                    b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PaymentStatus")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PaymentTerm")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("UserId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CustomersId");
+                    b.HasIndex("CustomerId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Invoices");
                 });
 
             modelBuilder.Entity("InvoiceApp.Models.Item", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("uniqueidentifier");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Aciklama")
+                    b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Ad")
+                    b.Property<int>("InvoiceId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Adet")
-                        .HasColumnType("int");
-
-                    b.Property<int>("InvoicesId")
-                        .HasColumnType("int");
-
-                    b.Property<double>("Toplam")
+                    b.Property<double>("Price")
                         .HasColumnType("float");
 
-                    b.Property<double>("Tutar")
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<double>("Total")
                         .HasColumnType("float");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("InvoicesId");
+                    b.HasIndex("InvoiceId");
 
                     b.ToTable("Items");
                 });
@@ -133,11 +136,7 @@ namespace InvoiceApp.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("AdSoyad")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Adres")
+                    b.Property<string>("Address")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -145,16 +144,20 @@ namespace InvoiceApp.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Eposta")
+                    b.Property<string>("Country")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Kod")
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("PostCode")
                         .HasColumnType("int");
-
-                    b.Property<string>("Ulke")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -163,35 +166,39 @@ namespace InvoiceApp.Migrations
 
             modelBuilder.Entity("InvoiceApp.Models.Customer", b =>
                 {
-                    b.HasOne("InvoiceApp.Models.User", "Users")
+                    b.HasOne("InvoiceApp.Models.User", "User")
                         .WithMany("Customers")
-                        .HasForeignKey("UsersId")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Users");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("InvoiceApp.Models.Invoice", b =>
                 {
-                    b.HasOne("InvoiceApp.Models.Customer", "Customers")
+                    b.HasOne("InvoiceApp.Models.Customer", "Customer")
                         .WithMany()
-                        .HasForeignKey("CustomersId")
+                        .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Customers");
+                    b.HasOne("InvoiceApp.Models.User", null)
+                        .WithMany("Invoices")
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("Customer");
                 });
 
             modelBuilder.Entity("InvoiceApp.Models.Item", b =>
                 {
-                    b.HasOne("InvoiceApp.Models.Invoice", "Invoices")
+                    b.HasOne("InvoiceApp.Models.Invoice", "Invoice")
                         .WithMany("Items")
-                        .HasForeignKey("InvoicesId")
+                        .HasForeignKey("InvoiceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Invoices");
+                    b.Navigation("Invoice");
                 });
 
             modelBuilder.Entity("InvoiceApp.Models.Invoice", b =>
@@ -202,6 +209,8 @@ namespace InvoiceApp.Migrations
             modelBuilder.Entity("InvoiceApp.Models.User", b =>
                 {
                     b.Navigation("Customers");
+
+                    b.Navigation("Invoices");
                 });
 #pragma warning restore 612, 618
         }

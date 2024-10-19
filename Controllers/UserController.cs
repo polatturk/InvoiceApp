@@ -2,7 +2,7 @@
 
 namespace InvoiceApp.Controllers
 {
-    public class FaturaController : Controller
+    public class UserController : Controller
     {
         public IActionResult Index()
         {

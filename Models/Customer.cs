@@ -1,15 +1,22 @@
-﻿namespace InvoiceApp.Models
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
+
+namespace InvoiceApp.Models
 {
     public class Customer
     {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
-        public string AdSoyad { get; set; }
-        public string EPosta { get; set; }
-        public string Adres { get; set; }
-        public string Sehir { get; set; }
-        public string Ulke { get; set; }
-        public int kod { get; set; }
-        public User Users { get; set; }
+        public string FullName { get; set; }
+        public string Email { get; set; }
+        public string Address { get; set; }
+        public string City { get; set; }
+        public string Country { get; set; }
+        public int PostCode { get; set; }
+        [ForeignKey("User")]
+        public int UserId { get; set; }
+        public User User { get; set; }
 
     }
 }
