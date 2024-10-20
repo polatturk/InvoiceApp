@@ -16,6 +16,7 @@ namespace InvoiceApp.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         public DateTime CreatedDate { get; set; }
+        public DateTime UpdatedDate { get; set; } = DateTime.Now;
         public PaymentStatus PaymentStatus { get; set; }
         public int CustomerId { get; set; }
         [ForeignKey("CustomerId")]

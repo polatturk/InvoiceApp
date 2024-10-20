@@ -76,7 +76,6 @@ namespace InvoiceApp.Controllers
             _context.Invoices.Add(invoice);
             _context.SaveChanges();
 
-            // Yanıt olarak invoice ve item bilgilerini dönelim
             var response = new
             {
                 InvoiceId = invoice.Id,
@@ -86,7 +85,7 @@ namespace InvoiceApp.Controllers
                 CustomerName = _context.Customers
                     .Where(c => c.Id == invoice.CustomerId)
                     .Select(c => c.FullName)
-                    .FirstOrDefault(), // Müşteri ismini alıyoruz
+                    .FirstOrDefault(),
                 Items = items.Select(i => new
                 {
                     ItemId = i.Id,
@@ -100,10 +99,13 @@ namespace InvoiceApp.Controllers
             return CreatedAtAction(nameof(GetInvoice), new { id = invoice.Id }, response);
         }
 
-        [HttpPut("{id}")]
-        public ActionResult<Invoice> UpdateInvoice(int id, [FromBody] DtoInvoiceUpdateRequest invoiceRequest)
+        [HttpPut]
+        public ActionResult<Invoice> UpdateInvoice([FromBody] DtoInvoiceUpdateRequest invoiceRequest)
         {
-            var invoice = _context.Invoices.Find(id);
+            var invoice = _context.Invoices
+                .Include(i => i.Items) 
+                .FirstOrDefault(i => i.Id == invoiceRequest.Id);
+
             if (invoice is null)
                 return NotFound();
 
@@ -112,6 +114,7 @@ namespace InvoiceApp.Controllers
             invoice.PaymentTerm = invoiceRequest.PaymentTerm;
             invoice.CustomerId = invoiceRequest.CustomerId;
 
+            invoice.UpdatedDate = DateTime.Now; 
             _context.SaveChanges();
 
             return Ok(invoice);
