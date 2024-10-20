@@ -26,7 +26,7 @@ namespace InvoiceApp.Controllers
         [HttpGet("{id}")]
         public ActionResult<Customer> GetCustomer(int id)
         {
-            var customer = _context.Customers.FirstOrDefault();
+            var customer = _context.Customers.FirstOrDefault(c => c.Id == id);
 
             if (customer is null)
                 return NotFound();

@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace InvoiceApp.Models
 {
@@ -7,7 +8,7 @@ namespace InvoiceApp.Models
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public Guid Id { get; set; }
+        public int Id { get; set; }
 
         public string Name { get; set; }
         public string Description { get; set; }
@@ -15,9 +16,9 @@ namespace InvoiceApp.Models
         public double Price { get; set; }
 
         public double Total { get; set; }
-
         public int InvoiceId { get; set; }
         [ForeignKey("InvoiceId")]
+        [JsonIgnore]
         public Invoice Invoice { get; set; }
     }
 }

@@ -27,7 +27,7 @@ namespace InvoiceApp.Controllers
         [HttpGet("{id}")]
         public ActionResult<Item> GetItem(int id)
         {
-            var item = _context.Items.FirstOrDefault();
+            var item = _context.Items.FirstOrDefault(x => x.Id == id);
 
             if (item is null)
                 return NotFound();
@@ -38,11 +38,6 @@ namespace InvoiceApp.Controllers
         [HttpPost]
         public ActionResult<Item> AddItem([FromBody] DtoItemCreateRequest itemRequest)
         {
-            if (string.IsNullOrEmpty(itemRequest.Name))
-            {
-                return BadRequest("Geçersiz kullanıcı verisi.");
-            }
-
             var invoice = _context.Invoices.Find(itemRequest.InvoiceId);
             if (invoice == null)
             {
@@ -55,8 +50,8 @@ namespace InvoiceApp.Controllers
                 Description = itemRequest.Description,
                 Quantity = itemRequest.Quantity,
                 Price = itemRequest.Price,
-                InvoiceId = itemRequest.InvoiceId,
-                Total = itemRequest.Quantity * itemRequest.Price
+                Total = itemRequest.Quantity * itemRequest.Price,
+                InvoiceId = itemRequest.InvoiceId
             };
 
             _context.Items.Add(item);
