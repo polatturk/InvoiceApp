@@ -14,7 +14,7 @@ namespace InvoiceApp.Models
         public int Quantity { get; set; }
         public double Price { get; set; }
 
-        public double Total => Quantity * Price;
+        public double Total { get; set; }
 
         public int InvoiceId { get; set; }
         [ForeignKey("InvoiceId")]
