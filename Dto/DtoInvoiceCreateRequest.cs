@@ -10,5 +10,7 @@ namespace InvoiceApp.Dto
         public PaymentStatus PaymentStatus { get; set; }
         public int PaymentTerm { get; set; }
         public int CustomerId { get; set; }
+        public string CustomerFullName { get; set; }
+        public List<int> ItemIds { get; set; }
     }
 }

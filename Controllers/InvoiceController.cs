@@ -2,6 +2,8 @@
 using InvoiceApp.Dto;
 using InvoiceApp.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace InvoiceApp.Controllers
 {
@@ -17,16 +19,36 @@ namespace InvoiceApp.Controllers
         }
 
         [HttpGet]
-        public List<Invoice> GetInvoices()
+        public ActionResult<List<object>> GetInvoices()
         {
-            List<Invoice> invoices = _context.Invoices.ToList();
-            return invoices;
+            var invoices = _context.Invoices
+                .Include(i => i.Customer)
+                .Include(i => i.Items)
+                .Select(i => new
+                {
+                    InvoiceId = i.Id,
+                    CreatedDate = i.CreatedDate,
+                    PaymentStatus = i.PaymentStatus,
+                    PaymentTerm = i.PaymentTerm,
+                    CustomerName = i.Customer.FullName,
+                    Items = i.Items.Select(item => new
+                    {
+                        ItemId = item.Id,
+                        Name = item.Name,
+                        Description = item.Description,
+                        Quantity = item.Quantity,
+                        Price = item.Price
+                    }).ToList()
+                })
+                .ToList();
+
+            return Ok(invoices);
         }
 
         [HttpGet("{id}")]
         public ActionResult<Invoice> GetInvoice(int id)
         {
-            var invoice = _context.Invoices.FirstOrDefault();
+            var invoice = _context.Invoices.FirstOrDefault(i => i.Id == id);
 
             if (invoice is null)
                 return NotFound();
@@ -35,20 +57,47 @@ namespace InvoiceApp.Controllers
         }
 
         [HttpPost]
-        public ActionResult<Invoice> AddInvoice([FromBody] DtoInvoiceCreateRequest invoicerequest)
+        public ActionResult<object> AddInvoice([FromBody] DtoInvoiceCreateRequest invoiceRequest)
         {
             var invoice = new Invoice
             {
-                CreatedDate = invoicerequest.CreatedDate,
-                PaymentStatus = invoicerequest.PaymentStatus,
-                PaymentTerm = invoicerequest.PaymentTerm,
-                CustomerId = invoicerequest.CustomerId,
+                CreatedDate = invoiceRequest.CreatedDate,
+                PaymentStatus = invoiceRequest.PaymentStatus,
+                PaymentTerm = invoiceRequest.PaymentTerm,
+                CustomerId = invoiceRequest.CustomerId,
             };
+
+            var items = _context.Items
+                .Where(item => invoiceRequest.ItemIds.Contains(item.Id))
+                .ToList();
+
+            invoice.Items = items;
 
             _context.Invoices.Add(invoice);
             _context.SaveChanges();
 
-            return CreatedAtAction(nameof(GetInvoice), new { id = invoice.Id }, invoice);
+            // Yanıt olarak invoice ve item bilgilerini dönelim
+            var response = new
+            {
+                InvoiceId = invoice.Id,
+                CreatedDate = invoice.CreatedDate,
+                PaymentStatus = invoice.PaymentStatus,
+                PaymentTerm = invoice.PaymentTerm,
+                CustomerName = _context.Customers
+                    .Where(c => c.Id == invoice.CustomerId)
+                    .Select(c => c.FullName)
+                    .FirstOrDefault(), // Müşteri ismini alıyoruz
+                Items = items.Select(i => new
+                {
+                    ItemId = i.Id,
+                    Name = i.Name,
+                    Description = i.Description,
+                    Quantity = i.Quantity,
+                    Price = i.Price
+                }).ToList()
+            };
+
+            return CreatedAtAction(nameof(GetInvoice), new { id = invoice.Id }, response);
         }
 
         [HttpDelete("{id}")]

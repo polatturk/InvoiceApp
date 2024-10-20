@@ -21,7 +21,7 @@ namespace InvoiceApp.Models
         [ForeignKey("CustomerId")]
         public Customer Customer { get; set; }
         public int PaymentTerm { get; set; }
-        public ICollection<Item> Items { get; set; }
+        public ICollection<Item> Items { get; set; } = new List<Item>();
     }
 }
                          
