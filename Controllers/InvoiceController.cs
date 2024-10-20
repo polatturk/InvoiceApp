@@ -51,6 +51,23 @@ namespace InvoiceApp.Controllers
             return CreatedAtAction(nameof(GetInvoice), new { id = invoice.Id }, invoice);
         }
 
+        [HttpPut("{id}")]
+        public ActionResult<Invoice> UpdateInvoice(int id, [FromBody] DtoInvoiceUpdateRequest invoiceRequest)
+        {
+            var invoice = _context.Invoices.Find(id);
+            if (invoice is null)
+                return NotFound();
+
+            invoice.CreatedDate = invoiceRequest.CreatedDate;
+            invoice.PaymentStatus = invoiceRequest.PaymentStatus;
+            invoice.PaymentTerm = invoiceRequest.PaymentTerm;
+            invoice.CustomerId = invoiceRequest.CustomerId;
+
+            _context.SaveChanges();
+
+            return Ok(invoice);
+        }
+
         [HttpDelete("{id}")]
         public bool DeleteInvoice(int id)
         {

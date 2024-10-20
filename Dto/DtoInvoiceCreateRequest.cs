@@ -11,4 +11,11 @@ namespace InvoiceApp.Dto
         public int PaymentTerm { get; set; }
         public int CustomerId { get; set; }
     }
+    public class DtoInvoiceUpdateRequest
+    {
+        public DateTime CreatedDate { get; set; }
+        public PaymentStatus PaymentStatus { get; set; }
+        public int PaymentTerm { get; set; }
+        public int CustomerId { get; set; }
+    }
 }
