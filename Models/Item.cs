@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace InvoiceApp.Models
 {
@@ -18,6 +19,7 @@ namespace InvoiceApp.Models
 
         public int InvoiceId { get; set; }
         [ForeignKey("InvoiceId")]
+        [JsonIgnore]
         public Invoice Invoice { get; set; }
     }
 }

@@ -38,11 +38,6 @@ namespace InvoiceApp.Controllers
         [HttpPost]
         public ActionResult<Item> AddItem([FromBody] DtoItemCreateRequest itemRequest)
         {
-            if (string.IsNullOrEmpty(itemRequest.Name))
-            {
-                return BadRequest("Geçersiz kullanıcı verisi.");
-            }
-
             var invoice = _context.Invoices.Find(itemRequest.InvoiceId);
             if (invoice == null)
             {
