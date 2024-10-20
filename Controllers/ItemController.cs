@@ -26,7 +26,7 @@ namespace InvoiceApp.Controllers
         [HttpGet("{id}")]
         public ActionResult<Item> GetItem(int id)
         {
-            var item = _context.Items.FirstOrDefault(e => e.InvoiceId == id);
+            var item = _context.Items.FirstOrDefault();
 
             if (item is null)
                 return NotFound();
@@ -37,10 +37,6 @@ namespace InvoiceApp.Controllers
         [HttpPost]
         public ActionResult<Item> AddItem([FromBody] Item item)
         {
-            if (string.IsNullOrEmpty(item.Name) || item.Quantity <= 0 || item.Price <= 0)
-            {
-                return BadRequest("Geçersiz item verisi.");
-            }
 
             _context.Items.Add(item);
             _context.SaveChanges();

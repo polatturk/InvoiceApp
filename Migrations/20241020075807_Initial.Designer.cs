@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace InvoiceApp.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20241019202952_Initial")]
+    [Migration("20241020075807_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -121,9 +121,6 @@ namespace InvoiceApp.Migrations
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
-                    b.Property<double>("Total")
-                        .HasColumnType("float");
-
                     b.HasKey("Id");
 
                     b.HasIndex("InvoiceId");
@@ -172,7 +169,7 @@ namespace InvoiceApp.Migrations
                     b.HasOne("InvoiceApp.Models.User", "User")
                         .WithMany("Customers")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("User");
@@ -181,16 +178,19 @@ namespace InvoiceApp.Migrations
             modelBuilder.Entity("InvoiceApp.Models.Invoice", b =>
                 {
                     b.HasOne("InvoiceApp.Models.Customer", "Customer")
-                        .WithMany()
+                        .WithMany("Invoices")
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("InvoiceApp.Models.User", null)
+                    b.HasOne("InvoiceApp.Models.User", "User")
                         .WithMany("Invoices")
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("Customer");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("InvoiceApp.Models.Item", b =>
@@ -202,6 +202,11 @@ namespace InvoiceApp.Migrations
                         .IsRequired();
 
                     b.Navigation("Invoice");
+                });
+
+            modelBuilder.Entity("InvoiceApp.Models.Customer", b =>
+                {
+                    b.Navigation("Invoices");
                 });
 
             modelBuilder.Entity("InvoiceApp.Models.Invoice", b =>

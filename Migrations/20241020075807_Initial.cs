@@ -50,8 +50,7 @@ namespace InvoiceApp.Migrations
                         name: "FK_Customers_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -63,8 +62,8 @@ namespace InvoiceApp.Migrations
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     PaymentStatus = table.Column<int>(type: "int", nullable: false),
                     CustomerId = table.Column<int>(type: "int", nullable: false),
-                    PaymentTerm = table.Column<int>(type: "int", nullable: false),
-                    UserId = table.Column<int>(type: "int", nullable: true)
+                    UserId = table.Column<int>(type: "int", nullable: true),
+                    PaymentTerm = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -91,7 +90,6 @@ namespace InvoiceApp.Migrations
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Quantity = table.Column<int>(type: "int", nullable: false),
                     Price = table.Column<double>(type: "float", nullable: false),
-                    Total = table.Column<double>(type: "float", nullable: false),
                     InvoiceId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>

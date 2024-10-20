@@ -15,10 +15,20 @@ namespace InvoiceApp.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
+
         public DateTime CreatedDate { get; set; }
         public PaymentStatus PaymentStatus { get; set; }
+
+        public int CustomerId { get; set; }
+        [ForeignKey("CustomerId")]
         public Customer Customer { get; set; }
+
+        public int? UserId { get; set; }
+        [ForeignKey("UserId")]
+        public User User { get; set; }
+
         public int PaymentTerm { get; set; }
-        public List<Item> Items { get; set; }
+
+        public ICollection<Item> Items { get; set; }
     }
 }
