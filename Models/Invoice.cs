@@ -24,3 +24,4 @@ namespace InvoiceApp.Models
         public ICollection<Item> Items { get; set; }
     }
 }
+                         
