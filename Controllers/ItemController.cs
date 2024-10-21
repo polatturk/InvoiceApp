@@ -38,12 +38,6 @@ namespace InvoiceApp.Controllers
         [HttpPost]
         public ActionResult<Item> AddItem([FromBody] DtoItemCreateRequest itemRequest)
         {
-            var invoice = _context.Invoices.Find(itemRequest.InvoiceId);
-            if (invoice == null)
-            {
-                return NotFound("Geçersiz fatura ID'si.");
-            }
-
             var item = new Item
             {
                 Name = itemRequest.Name,
@@ -51,7 +45,6 @@ namespace InvoiceApp.Controllers
                 Quantity = itemRequest.Quantity,
                 Price = itemRequest.Price,
                 Total = itemRequest.Quantity * itemRequest.Price,
-                InvoiceId = itemRequest.InvoiceId
             };
 
             _context.Items.Add(item);

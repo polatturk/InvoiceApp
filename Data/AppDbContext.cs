@@ -30,6 +30,12 @@ namespace InvoiceApp.Data
                 .WithMany(inv => inv.Items)
                 .HasForeignKey(i => i.InvoiceId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Customer>()
+                .HasOne(c => c.Client)
+                .WithMany(c => c.Customers)
+                .HasForeignKey(c => c.ClientId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }
