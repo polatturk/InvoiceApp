@@ -2,6 +2,7 @@
 using InvoiceApp.Dto;
 using InvoiceApp.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace InvoiceApp.Controllers
 {
@@ -17,10 +18,12 @@ namespace InvoiceApp.Controllers
         }
 
         [HttpGet]
-        public List<DtoCustomerCreateRequest> GetCustomers()
+        public IActionResult GetCustomers()
         {
             var customers = _context.Customers
-                .Select(c => new DtoCustomerCreateRequest
+                .Include(c => c.Invoices)
+                    .ThenInclude(i => i.Items) 
+                .Select(c => new
                 {
                     FullName = c.FullName,
                     Email = c.Email,
@@ -28,12 +31,31 @@ namespace InvoiceApp.Controllers
                     City = c.City,
                     Country = c.Country,
                     PostCode = c.PostCode,
-                    ClientId = c.ClientId 
+                    ClientId = c.ClientId,
+                    Invoices = c.Invoices.Select(i => new
+                    {
+                        i.Id,
+                        i.CreatedDate,
+                        i.Description,
+                        i.PaymentStatus,
+                        i.PaymentTerm,
+                        TotalAmount = i.Items.Sum(item => item.Total), 
+                        Items = i.Items.Select(item => new
+                        {
+                            item.Id,
+                            item.Name,
+                            item.Description,
+                            item.Quantity,
+                            item.Price,
+                            item.Total
+                        }).ToList()
+                    }).ToList()
                 })
                 .ToList();
 
-            return customers;
+            return Ok(customers);
         }
+
 
         [HttpGet("{id}")]
         public ActionResult<Customer> GetCustomer(int id)

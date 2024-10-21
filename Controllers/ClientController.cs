@@ -20,48 +20,54 @@ namespace InvoiceApp.Controllers
         }
 
         [HttpGet]
-        public ActionResult<List<DtoClientCreateRequest>> GetClients()
+        public IActionResult GetClients()
         {
             var clients = _context.Client
-                .Include(c => c.Customers)  
-                .Include(c => c.Invoices) 
-                .Include(c => c.Items)        
+                .Include(c => c.Customers)
+                    .ThenInclude(c => c.Invoices)
+                        .ThenInclude(i => i.Items)
+                .Include(c => c.Items) // Eğer Client'ın kendi Items'ı da varsa ekleyin
+                .Select(c => new
+                {
+                    c.Id,
+                    c.Name,
+                    c.Adress,
+                    c.City,
+                    c.PostCode,
+                    c.Country,
+                    Customers = c.Customers.Select(customer => new
+                    {
+                        FullName = customer.FullName,
+                        Email = customer.Email,
+                        Address = customer.Address,
+                        City = customer.City,
+                        PostCode = customer.PostCode,
+                        Country = customer.Country,
+                        Invoices = customer.Invoices.Select(invoice => new
+                        {
+                            invoice.Id,
+                            invoice.CreatedDate,
+                            invoice.Description,
+                            invoice.PaymentStatus,
+                            invoice.PaymentTerm,
+                            TotalAmount = invoice.Items.Sum(item => item.Total),
+                            Items = invoice.Items.Select(item => new
+                            {
+                                item.Id,
+                                item.Name,
+                                item.Description,
+                                item.Quantity,
+                                item.Price,
+                                item.Total
+                            }).ToList()
+                        }).ToList()
+                    }).ToList()
+                })
                 .ToList();
 
-            var clientDtos = clients.Select(c => new DtoClientCreateRequest
-            {
-                Id = c.Id,
-                Name = c.Name,
-                Adress = c.Adress,
-                City = c.City,
-                PostCode = c.PostCode,
-                Country = c.Country,
-                Customers = c.Customers.Select(customer => new DtoCustomerCreateRequest
-                {
-                    FullName = customer.FullName,
-                    Email = customer.Email,
-                    Address = customer.Address,
-                    City = customer.City,
-                    PostCode = customer.PostCode,
-                    Country = customer.Country
-                }).ToList(),
-                Invoices = c.Invoices.Select(invoice => new DtoInvoiceCreateRequest
-                {
-                    Id = invoice.Id,
-                    CreatedDate = invoice.CreatedDate,
-                    PaymentStatus = invoice.PaymentStatus,
-                    PaymentTerm = invoice.PaymentTerm
-                }).ToList(),
-                Items = c.Items.Select(item => new DtoItemCreateRequest
-                {
-                    Name = item.Name,
-                    Price = item.Price,
-                    Quantity = item.Quantity
-                }).ToList()
-            }).ToList();
-
-            return Ok(clientDtos);
+            return Ok(clients);
         }
+
 
 
         [HttpGet("{id}")]
