@@ -31,19 +31,27 @@ namespace InvoiceApp.Controllers
                     PaymentStatus = i.PaymentStatus,
                     PaymentTerm = i.PaymentTerm,
                     CustomerName = i.Customer.FullName,
+                    CustomerAddress = i.Customer.Address,
+                    CustomerEmail = i.Customer.Email,
+                    CustomerCity = i.Customer.City,
+                    CustomerCountry = i.Customer.Country,
+                    CustomerPostCode = i.Customer.PostCode,
                     Items = i.Items.Select(item => new
                     {
                         ItemId = item.Id,
                         Name = item.Name,
                         Description = item.Description,
                         Quantity = item.Quantity,
-                        Price = item.Price
-                    }).ToList()
+                        Price = item.Price,
+                        Total = item.Total
+                    }).ToList(),
+                    TotalAmount = i.Items.Sum(item => item.Total)
                 })
                 .ToList();
 
             return Ok(invoices);
         }
+
 
         [HttpGet("{id}")]
         public ActionResult<Invoice> GetInvoice(int id)
@@ -76,7 +84,6 @@ namespace InvoiceApp.Controllers
             _context.Invoices.Add(invoice);
             _context.SaveChanges();
 
-            // Yanıt olarak invoice ve item bilgilerini dönelim
             var response = new
             {
                 InvoiceId = invoice.Id,
@@ -86,7 +93,7 @@ namespace InvoiceApp.Controllers
                 CustomerName = _context.Customers
                     .Where(c => c.Id == invoice.CustomerId)
                     .Select(c => c.FullName)
-                    .FirstOrDefault(), // Müşteri ismini alıyoruz
+                    .FirstOrDefault(), 
                 Items = items.Select(i => new
                 {
                     ItemId = i.Id,
