@@ -11,6 +11,7 @@ namespace InvoiceApp.Dto
         public int PaymentTerm { get; set; }
         public int CustomerId { get; set; }
         public string CustomerFullName { get; set; }
+        public string Description { get; set; }
         public List<int> ItemIds { get; set; }
     }
     public class DtoInvoiceUpdateRequest
@@ -18,6 +19,7 @@ namespace InvoiceApp.Dto
         public int Id { get; set; }  
         public DateTime CreatedDate { get; set; }
         public PaymentStatus PaymentStatus { get; set; }
+        public string Description { get; set; }
         public int PaymentTerm { get; set; }
         public int CustomerId { get; set; }
     }
