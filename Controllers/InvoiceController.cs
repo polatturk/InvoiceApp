@@ -52,16 +52,42 @@ namespace InvoiceApp.Controllers
             return Ok(invoices);
         }
 
-
         [HttpGet("{id}")]
-        public ActionResult<Invoice> GetInvoice(int id)
+        public ActionResult<object> GetInvoice(int id)
         {
-            var invoice = _context.Invoices.FirstOrDefault(i => i.Id == id);
+            var invoice = _context.Invoices
+                .Include(i => i.Customer)
+                .Include(i => i.Items)
+                .FirstOrDefault(i => i.Id == id);
 
             if (invoice is null)
                 return NotFound();
 
-            return Ok(invoice);
+            var response = new
+            {
+                InvoiceId = invoice.Id,
+                CreatedDate = invoice.CreatedDate,
+                PaymentStatus = invoice.PaymentStatus,
+                PaymentTerm = invoice.PaymentTerm,
+                CustomerName = invoice.Customer.FullName,
+                CustomerAddress = invoice.Customer.Address,
+                CustomerEmail = invoice.Customer.Email,
+                CustomerCity = invoice.Customer.City,
+                CustomerCountry = invoice.Customer.Country,
+                CustomerPostCode = invoice.Customer.PostCode,
+                Items = invoice.Items.Select(item => new
+                {
+                    ItemId = item.Id,
+                    Name = item.Name,
+                    Description = item.Description,
+                    Quantity = item.Quantity,
+                    Price = item.Price,
+                    Total = item.Total
+                }).ToList(),
+                TotalAmount = invoice.Items.Sum(item => item.Total)
+            };
+
+            return Ok(response);
         }
 
         [HttpPost]
@@ -111,7 +137,7 @@ namespace InvoiceApp.Controllers
         public ActionResult<Invoice> UpdateInvoice([FromBody] DtoInvoiceUpdateRequest invoiceRequest)
         {
             var invoice = _context.Invoices
-                .Include(i => i.Items) 
+                .Include(i => i.Items)
                 .FirstOrDefault(i => i.Id == invoiceRequest.Id);
 
             if (invoice is null)
@@ -122,7 +148,7 @@ namespace InvoiceApp.Controllers
             invoice.PaymentTerm = invoiceRequest.PaymentTerm;
             invoice.CustomerId = invoiceRequest.CustomerId;
 
-            invoice.UpdatedDate = DateTime.Now; 
+            invoice.UpdatedDate = DateTime.Now;
             _context.SaveChanges();
 
             return Ok(invoice);
