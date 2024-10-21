@@ -30,7 +30,7 @@ namespace InvoiceApp.Controllers
                     CreatedDate = i.CreatedDate,
                     PaymentStatus = i.PaymentStatus,
                     PaymentTerm = i.PaymentTerm,
-                    CustomerName = i.Customer.FullName,
+                    Description = i.Description, 
                     CustomerAddress = i.Customer.Address,
                     CustomerEmail = i.Customer.Email,
                     CustomerCity = i.Customer.City,
@@ -69,7 +69,7 @@ namespace InvoiceApp.Controllers
                 CreatedDate = invoice.CreatedDate,
                 PaymentStatus = invoice.PaymentStatus,
                 PaymentTerm = invoice.PaymentTerm,
-                CustomerName = invoice.Customer.FullName,
+                Description = invoice.Description, 
                 CustomerAddress = invoice.Customer.Address,
                 CustomerEmail = invoice.Customer.Email,
                 CustomerCity = invoice.Customer.City,
@@ -99,6 +99,7 @@ namespace InvoiceApp.Controllers
                 PaymentStatus = invoiceRequest.PaymentStatus,
                 PaymentTerm = invoiceRequest.PaymentTerm,
                 CustomerId = invoiceRequest.CustomerId,
+                Description = invoiceRequest.Description 
             };
 
             var items = _context.Items
@@ -116,10 +117,11 @@ namespace InvoiceApp.Controllers
                 CreatedDate = invoice.CreatedDate,
                 PaymentStatus = invoice.PaymentStatus,
                 PaymentTerm = invoice.PaymentTerm,
+                Description = invoice.Description, 
                 CustomerName = _context.Customers
                     .Where(c => c.Id == invoice.CustomerId)
                     .Select(c => c.FullName)
-                    .FirstOrDefault(), // Müşteri ismini alıyoruz
+                    .FirstOrDefault(),
                 Items = items.Select(i => new
                 {
                     ItemId = i.Id,
@@ -147,8 +149,9 @@ namespace InvoiceApp.Controllers
             invoice.PaymentStatus = invoiceRequest.PaymentStatus;
             invoice.PaymentTerm = invoiceRequest.PaymentTerm;
             invoice.CustomerId = invoiceRequest.CustomerId;
-
+            invoice.Description = invoiceRequest.Description; 
             invoice.UpdatedDate = DateTime.Now;
+
             _context.SaveChanges();
 
             return Ok(invoice);
@@ -160,8 +163,10 @@ namespace InvoiceApp.Controllers
             var invoice = _context.Invoices.Find(id);
             if (invoice is null)
                 return false;
+
             _context.Invoices.Remove(invoice);
             _context.SaveChanges();
+
             return true;
         }
     }
