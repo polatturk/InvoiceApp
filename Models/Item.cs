@@ -9,14 +9,12 @@ namespace InvoiceApp.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
-
         public string Name { get; set; }
         public string Description { get; set; }
         public int Quantity { get; set; }
         public double Price { get; set; }
-
         public double Total { get; set; }
-        public int InvoiceId { get; set; }
+        public int? InvoiceId { get; set; }
         [ForeignKey("InvoiceId")]
         [JsonIgnore]
         public Invoice Invoice { get; set; }

@@ -14,6 +14,9 @@ namespace InvoiceApp.Models
         public string City { get; set; }
         public string Country { get; set; }
         public int PostCode { get; set; }
+        public int ClientId { get; set; }
+        [ForeignKey("ClientId")]
+        public Client Client { get; set; }
         public ICollection<Invoice> Invoices { get; set; }
 
     }

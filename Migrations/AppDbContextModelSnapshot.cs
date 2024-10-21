@@ -70,7 +70,7 @@ namespace InvoiceApp.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("ClientId")
+                    b.Property<int>("ClientId")
                         .HasColumnType("int");
 
                     b.Property<string>("Country")
@@ -145,7 +145,7 @@ namespace InvoiceApp.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("InvoiceId")
+                    b.Property<int?>("InvoiceId")
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
@@ -172,9 +172,13 @@ namespace InvoiceApp.Migrations
 
             modelBuilder.Entity("InvoiceApp.Models.Customer", b =>
                 {
-                    b.HasOne("InvoiceApp.Models.Client", null)
+                    b.HasOne("InvoiceApp.Models.Client", "Client")
                         .WithMany("Customers")
-                        .HasForeignKey("ClientId");
+                        .HasForeignKey("ClientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Client");
                 });
 
             modelBuilder.Entity("InvoiceApp.Models.Invoice", b =>
@@ -201,8 +205,7 @@ namespace InvoiceApp.Migrations
                     b.HasOne("InvoiceApp.Models.Invoice", "Invoice")
                         .WithMany("Items")
                         .HasForeignKey("InvoiceId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Invoice");
                 });

@@ -39,6 +39,7 @@ namespace InvoiceApp.Controllers
                 Customers = c.Customers.Select(customer => new DtoCustomerCreateRequest
                 {
                     FullName = customer.FullName,
+                    Email = customer.Email,
                     Address = customer.Address,
                     City = customer.City,
                     PostCode = customer.PostCode,

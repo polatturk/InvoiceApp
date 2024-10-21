@@ -17,10 +17,22 @@ namespace InvoiceApp.Controllers
         }
 
         [HttpGet]
-        public List<Customer> GetCustomers()
+        public List<DtoCustomerCreateRequest> GetCustomers()
         {
-            List<Customer> customer = _context.Customers.ToList();
-            return customer;
+            var customers = _context.Customers
+                .Select(c => new DtoCustomerCreateRequest
+                {
+                    FullName = c.FullName,
+                    Email = c.Email,
+                    Address = c.Address,
+                    City = c.City,
+                    Country = c.Country,
+                    PostCode = c.PostCode,
+                    ClientId = c.ClientId 
+                })
+                .ToList();
+
+            return customers;
         }
 
         [HttpGet("{id}")]
@@ -35,33 +47,46 @@ namespace InvoiceApp.Controllers
         }
 
         [HttpPost]
-        public ActionResult<Customer> AddCustomer([FromBody] DtoCustomerCreateRequest customeRequest)
+        public ActionResult<Customer> AddCustomer([FromBody] DtoCustomerCreateRequest customerRequest)
         {
+            var defaultClient = _context.Client.FirstOrDefault();
+
+            if (defaultClient == null)
+            {
+                return BadRequest("Varsayılan bir Client bulunamadı.");
+            }
+
             var customer = new Customer
             {
-                FullName = customeRequest.FullName,
-                Email = customeRequest.Email,
-                Address = customeRequest.Address,
-                City = customeRequest.City,
-                Country = customeRequest.Country,
-                PostCode = customeRequest.PostCode,
+                FullName = customerRequest.FullName,
+                Email = customerRequest.Email,
+                Address = customerRequest.Address,
+                City = customerRequest.City,
+                Country = customerRequest.Country,
+                PostCode = customerRequest.PostCode,
+                ClientId = defaultClient.Id  
             };
 
             _context.Customers.Add(customer);
             _context.SaveChanges();
 
-            return CreatedAtAction(nameof(GetCustomer), new { id = customer.Id }, customer);
+            return Ok("Musteri eklendi.");
         }
 
         [HttpDelete("{id}")]
-        public bool DeleteItem(int id)
+        public IActionResult DeleteCustomer(int id)
         {
-            var item = _context.Items.Find(id);
-            if (item is null)
-                return false;
-            _context.Items.Remove(item);
+            var customer = _context.Customers.Find(id);
+            if (customer is null)
+            {
+                return NotFound("Silinecek müşteri bulunamadı.");
+            }
+
+            _context.Customers.Remove(customer);
             _context.SaveChanges();
-            return true;
+
+            return Ok("Silme işlemi başarılı.");
         }
+
     }
 }
