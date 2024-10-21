@@ -8,6 +8,7 @@ namespace InvoiceApp.Data
         public DbSet<Invoice> Invoices { get; set; }
         public DbSet<Customer> Customers { get; set; }
         public DbSet<Item> Items { get; set; }
+        public DbSet<Client> Client { get; set; }
 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
