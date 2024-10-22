@@ -22,9 +22,10 @@ namespace InvoiceApp.Controllers
         {
             var customers = _context.Customers
                 .Include(c => c.Invoices)
-                    .ThenInclude(i => i.Items) 
+                    .ThenInclude(i => i.Items)
                 .Select(c => new
                 {
+                    Id = c.Id,
                     FullName = c.FullName,
                     Email = c.Email,
                     Address = c.Address,
@@ -38,8 +39,8 @@ namespace InvoiceApp.Controllers
                         i.CreatedDate,
                         i.Description,
                         i.PaymentStatus,
-                        i.PaymentTerm,
-                        TotalAmount = i.Items.Sum(item => item.Total), 
+                        PaymentTerm = i.PaymentTerm.ToString(),
+                        TotalAmount = i.Items.Sum(item => item.Quantity * item.Price), 
                         Items = i.Items.Select(item => new
                         {
                             item.Id,
@@ -47,7 +48,7 @@ namespace InvoiceApp.Controllers
                             item.Description,
                             item.Quantity,
                             item.Price,
-                            item.Total
+                            Total = item.Quantity * item.Price 
                         }).ToList()
                     }).ToList()
                 })
@@ -55,6 +56,7 @@ namespace InvoiceApp.Controllers
 
             return Ok(customers);
         }
+
 
 
         [HttpGet("{id}")]
@@ -86,7 +88,7 @@ namespace InvoiceApp.Controllers
                 City = customerRequest.City,
                 Country = customerRequest.Country,
                 PostCode = customerRequest.PostCode,
-                ClientId = defaultClient.Id  
+                ClientId = 2
             };
 
             _context.Customers.Add(customer);

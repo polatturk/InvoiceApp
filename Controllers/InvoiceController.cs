@@ -24,6 +24,7 @@ namespace InvoiceApp.Controllers
             var invoices = _context.Invoices
                 .Include(i => i.Customer)
                 .Include(i => i.Items)
+                .Include(i => i.Client)
                 .Select(i => new
                 {
                     InvoiceId = i.Id,
@@ -31,16 +32,23 @@ namespace InvoiceApp.Controllers
                     PaymentStatus = i.PaymentStatus,
                     PaymentTerm = i.PaymentTerm,
                     Description = i.Description,
-                    Customer = new List<object> 
+                    Customer = new
                     {
-                new
-                {
-                    Name = i.Customer.FullName,
-                    Address = i.Customer.Address,
-                    Email = i.Customer.Email,
-                    City = i.Customer.City,
-                    Country = i.Customer.Country,
-                    PostCode = i.Customer.PostCode,
+                        Name = i.Customer.FullName,
+                        Address = i.Customer.Address,
+                        Email = i.Customer.Email,
+                        City = i.Customer.City,
+                        Country = i.Customer.Country,
+                        PostCode = i.Customer.PostCode
+                    },
+                    Client = new
+                    {
+                        Name = i.Client.Name,
+                        City = i.Client.City,
+                        Country = i.Client.Country,
+                        PostCode = i.Client.PostCode,
+                        Address = i.Client.Adress
+                    },
                     Items = i.Items.Select(item => new
                     {
                         ItemId = item.Id,
@@ -48,19 +56,14 @@ namespace InvoiceApp.Controllers
                         Description = item.Description,
                         Quantity = item.Quantity,
                         Price = item.Price,
-                        Total = item.Total
-                    }).ToList()
-                }
-                    },
-                    TotalAmount = i.Items.Sum(item => item.Total)
+                        Total = item.Price * item.Quantity 
+                    }).ToList(),
+                    TotalAmount = i.Items.Sum(item => item.Price * item.Quantity) 
                 })
                 .ToList();
 
             return Ok(invoices);
         }
-
-
-
 
         [HttpGet("{id}")]
         public ActionResult<object> GetInvoice(int id)
@@ -110,7 +113,8 @@ namespace InvoiceApp.Controllers
                 PaymentStatus = invoiceRequest.PaymentStatus,
                 PaymentTerm = (PaymentTerm)invoiceRequest.PaymentTerm,
                 CustomerId = invoiceRequest.CustomerId,
-                Description = invoiceRequest.Description 
+                ClientId = 2,
+                Description = invoiceRequest.Description
             };
 
             var items = _context.Items
@@ -118,6 +122,8 @@ namespace InvoiceApp.Controllers
                 .ToList();
 
             invoice.Items = items;
+
+            invoice.TotalAmount = items.Sum(item => item.Price * item.Quantity);
 
             _context.Invoices.Add(invoice);
             _context.SaveChanges();
@@ -128,7 +134,7 @@ namespace InvoiceApp.Controllers
                 CreatedDate = invoice.CreatedDate,
                 PaymentStatus = invoice.PaymentStatus,
                 PaymentTerm = invoice.PaymentTerm,
-                Description = invoice.Description, 
+                Description = invoice.Description,
                 CustomerName = _context.Customers
                     .Where(c => c.Id == invoice.CustomerId)
                     .Select(c => c.FullName)
@@ -139,8 +145,10 @@ namespace InvoiceApp.Controllers
                     Name = i.Name,
                     Description = i.Description,
                     Quantity = i.Quantity,
-                    Price = i.Price
-                }).ToList()
+                    Price = i.Price,
+                    Total = i.Price * i.Quantity
+                }).ToList(),
+                TotalAmount = invoice.TotalAmount
             };
 
             return CreatedAtAction(nameof(GetInvoice), new { id = invoice.Id }, response);
@@ -160,13 +168,15 @@ namespace InvoiceApp.Controllers
             invoice.PaymentStatus = invoiceRequest.PaymentStatus;
             invoice.PaymentTerm = (PaymentTerm)invoiceRequest.PaymentTerm;
             invoice.CustomerId = invoiceRequest.CustomerId;
-            invoice.Description = invoiceRequest.Description; 
+            invoice.ClientId = 2;
+            invoice.Description = invoiceRequest.Description;
             invoice.UpdatedDate = DateTime.Now;
 
             _context.SaveChanges();
 
             return Ok(invoice);
         }
+
 
         [HttpDelete("{id}")]
         public bool DeleteInvoice(int id)

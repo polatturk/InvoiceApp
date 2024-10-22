@@ -16,7 +16,6 @@ namespace InvoiceApp.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-
             // Invoice -> Customer ilişkisinde Cascade Delete
             modelBuilder.Entity<Invoice>()
                 .HasOne(i => i.Customer)
@@ -31,12 +30,12 @@ namespace InvoiceApp.Data
                 .HasForeignKey(i => i.InvoiceId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // Customer -> Client ilişkisinde Cascade Delete
-            modelBuilder.Entity<Customer>()
-                .HasOne(c => c.Client)
-                .WithMany(c => c.Customers)
-                .HasForeignKey(c => c.ClientId)
-                .OnDelete(DeleteBehavior.Cascade);
+            // Client ile Invoice ilişkisi için Cascade Delete
+            modelBuilder.Entity<Invoice>()
+                .HasOne(i => i.Client)
+                .WithMany(c => c.Invoices)
+                .HasForeignKey(i => i.ClientId)
+                .OnDelete(DeleteBehavior.NoAction); 
         }
     }
 }

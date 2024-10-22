@@ -29,8 +29,12 @@ namespace InvoiceApp.Models
         [ForeignKey("CustomerId")]
         public Customer Customer { get; set; }
         public string Description { get; set; }
-        public ICollection<Item> Items { get; set; } = new List<Item>();
-        public double TotalAmount => Items.Sum(item => item.Total);
+        public List<Item> Items { get; set; } = new List<Item>();
+        public double TotalAmount { get; set; }
+        public double CalculatedTotalAmount => Items.Sum(item => item.Total);
+        public int ClientId { get; set; }
+        [ForeignKey("ClientId")]
+        public Client Client { get; set; }
     }
 }
                          

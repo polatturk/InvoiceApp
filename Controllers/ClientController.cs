@@ -24,9 +24,8 @@ namespace InvoiceApp.Controllers
         {
             var clients = _context.Client
                 .Include(c => c.Customers)
-                    .ThenInclude(c => c.Invoices)
-                        .ThenInclude(i => i.Items)
-                .Include(c => c.Items)
+                    .ThenInclude(customer => customer.Invoices)
+                        .ThenInclude(invoice => invoice.Items)
                 .Select(c => new
                 {
                     c.Id,
@@ -49,8 +48,8 @@ namespace InvoiceApp.Controllers
                             invoice.CreatedDate,
                             invoice.Description,
                             invoice.PaymentStatus,
-                            invoice.PaymentTerm,
-                            TotalAmount = invoice.Items.Sum(item => item.Total),
+                            PaymentTerm = invoice.PaymentTerm.ToString(),
+                            TotalAmount = invoice.Items.Sum(item => item.Quantity * item.Price),
                             Items = invoice.Items.Select(item => new
                             {
                                 item.Id,
@@ -58,7 +57,7 @@ namespace InvoiceApp.Controllers
                                 item.Description,
                                 item.Quantity,
                                 item.Price,
-                                item.Total
+                                Total = item.Quantity * item.Price
                             }).ToList()
                         }).ToList()
                     }).ToList()
