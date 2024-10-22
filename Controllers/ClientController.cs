@@ -26,7 +26,7 @@ namespace InvoiceApp.Controllers
                 .Include(c => c.Customers)
                     .ThenInclude(c => c.Invoices)
                         .ThenInclude(i => i.Items)
-                .Include(c => c.Items) // Eğer Client'ın kendi Items'ı da varsa ekleyin
+                .Include(c => c.Items)
                 .Select(c => new
                 {
                     c.Id,
@@ -68,8 +68,6 @@ namespace InvoiceApp.Controllers
             return Ok(clients);
         }
 
-
-
         [HttpGet("{id}")]
         public ActionResult<Client> GetClient(int id)
         {
@@ -80,34 +78,6 @@ namespace InvoiceApp.Controllers
             }
             return Ok(client);
         }
-            //[HttpPost]
-            //public ActionResult<object> AddClient([FromBody] DtoClientCreateRequest clientrequest)
-            //{
-            //    var client = new Client
-            //    {
-            //        Name = clientrequest.Name,
-            //        Adress = clientrequest.Adress,
-            //        City = clientrequest.City,
-            //        Country = clientrequest.Country,
-            //        PostCode = clientrequest.PostCode,
-            //    };
-
-
-            //    _context.Client.Add(client);
-            //    _context.SaveChanges();
-
-            //    var response = new
-            //    {
-            //        Name = clientrequest.Name,
-            //        Adress = clientrequest.Adress,
-            //        City = clientrequest.City,
-            //        Country = clientrequest.Country,
-            //        PostCode = clientrequest.PostCode,
-            //    };
-
-            //    return CreatedAtAction(nameof(GetClient), new { id = client.Id }, response);
-            //}
-
 
         [HttpPut("{id}")]
         public ActionResult<Client> UpdateClient(int id, [FromBody] Client updatedClient)

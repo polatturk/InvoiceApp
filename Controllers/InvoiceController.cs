@@ -30,12 +30,17 @@ namespace InvoiceApp.Controllers
                     CreatedDate = i.CreatedDate,
                     PaymentStatus = i.PaymentStatus,
                     PaymentTerm = i.PaymentTerm,
-                    Description = i.Description, 
-                    CustomerAddress = i.Customer.Address,
-                    CustomerEmail = i.Customer.Email,
-                    CustomerCity = i.Customer.City,
-                    CustomerCountry = i.Customer.Country,
-                    CustomerPostCode = i.Customer.PostCode,
+                    Description = i.Description,
+                    Customer = new List<object> 
+                    {
+                new
+                {
+                    Name = i.Customer.FullName,
+                    Address = i.Customer.Address,
+                    Email = i.Customer.Email,
+                    City = i.Customer.City,
+                    Country = i.Customer.Country,
+                    PostCode = i.Customer.PostCode,
                     Items = i.Items.Select(item => new
                     {
                         ItemId = item.Id,
@@ -44,13 +49,18 @@ namespace InvoiceApp.Controllers
                         Quantity = item.Quantity,
                         Price = item.Price,
                         Total = item.Total
-                    }).ToList(),
+                    }).ToList()
+                }
+                    },
                     TotalAmount = i.Items.Sum(item => item.Total)
                 })
                 .ToList();
 
             return Ok(invoices);
         }
+
+
+
 
         [HttpGet("{id}")]
         public ActionResult<object> GetInvoice(int id)
@@ -69,7 +79,8 @@ namespace InvoiceApp.Controllers
                 CreatedDate = invoice.CreatedDate,
                 PaymentStatus = invoice.PaymentStatus,
                 PaymentTerm = invoice.PaymentTerm,
-                Description = invoice.Description, 
+                Description = invoice.Description,
+                CustomerName = invoice.Customer.FullName,
                 CustomerAddress = invoice.Customer.Address,
                 CustomerEmail = invoice.Customer.Email,
                 CustomerCity = invoice.Customer.City,
@@ -97,7 +108,7 @@ namespace InvoiceApp.Controllers
             {
                 CreatedDate = invoiceRequest.CreatedDate,
                 PaymentStatus = invoiceRequest.PaymentStatus,
-                PaymentTerm = invoiceRequest.PaymentTerm,
+                PaymentTerm = (PaymentTerm)invoiceRequest.PaymentTerm,
                 CustomerId = invoiceRequest.CustomerId,
                 Description = invoiceRequest.Description 
             };
@@ -147,7 +158,7 @@ namespace InvoiceApp.Controllers
 
             invoice.CreatedDate = invoiceRequest.CreatedDate;
             invoice.PaymentStatus = invoiceRequest.PaymentStatus;
-            invoice.PaymentTerm = invoiceRequest.PaymentTerm;
+            invoice.PaymentTerm = (PaymentTerm)invoiceRequest.PaymentTerm;
             invoice.CustomerId = invoiceRequest.CustomerId;
             invoice.Description = invoiceRequest.Description; 
             invoice.UpdatedDate = DateTime.Now;

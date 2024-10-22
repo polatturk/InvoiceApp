@@ -31,6 +31,7 @@ namespace InvoiceApp.Data
                 .HasForeignKey(i => i.InvoiceId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            // Customer -> Client ilişkisinde Cascade Delete
             modelBuilder.Entity<Customer>()
                 .HasOne(c => c.Client)
                 .WithMany(c => c.Customers)
