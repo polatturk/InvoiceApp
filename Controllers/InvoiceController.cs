@@ -22,7 +22,6 @@ namespace InvoiceApp.Controllers
         public ActionResult<List<object>> GetInvoices()
         {
             var invoices = _context.Invoices
-                .Include(i => i.Customer)
                 .Include(i => i.Items)
                 .Include(i => i.Client)
                 .Select(i => new
@@ -32,15 +31,12 @@ namespace InvoiceApp.Controllers
                     PaymentStatus = i.PaymentStatus,
                     PaymentTerm = i.PaymentTerm,
                     Description = i.Description,
-                    Customer = new
-                    {
-                        Name = i.Customer.FullName,
-                        Address = i.Customer.Address,
-                        Email = i.Customer.Email,
-                        City = i.Customer.City,
-                        Country = i.Customer.Country,
-                        PostCode = i.Customer.PostCode
-                    },
+                    CustomerName = i.Customer.FullName,
+                    CustomerAddress = i.Customer.Address,
+                    CustomerEmail = i.Customer.Email,
+                    CustomerCity = i.Customer.City,
+                    CustomerCountry = i.Customer.Country,
+                    CustomerPostCode = i.Customer.PostCode,
                     Client = new
                     {
                         Name = i.Client.Name,
@@ -56,14 +52,15 @@ namespace InvoiceApp.Controllers
                         Description = item.Description,
                         Quantity = item.Quantity,
                         Price = item.Price,
-                        Total = item.Price * item.Quantity 
+                        Total = item.Price * item.Quantity
                     }).ToList(),
-                    TotalAmount = i.Items.Sum(item => item.Price * item.Quantity) 
+                    TotalAmount = i.Items.Sum(item => item.Price * item.Quantity)
                 })
                 .ToList();
 
             return Ok(invoices);
         }
+
 
         [HttpGet("{id}")]
         public ActionResult<object> GetInvoice(int id)
@@ -113,7 +110,7 @@ namespace InvoiceApp.Controllers
                 PaymentStatus = invoiceRequest.PaymentStatus,
                 PaymentTerm = (PaymentTerm)invoiceRequest.PaymentTerm,
                 CustomerId = invoiceRequest.CustomerId,
-                ClientId = 2,
+                ClientId = 3,
                 Description = invoiceRequest.Description
             };
 
@@ -168,7 +165,7 @@ namespace InvoiceApp.Controllers
             invoice.PaymentStatus = invoiceRequest.PaymentStatus;
             invoice.PaymentTerm = (PaymentTerm)invoiceRequest.PaymentTerm;
             invoice.CustomerId = invoiceRequest.CustomerId;
-            invoice.ClientId = 2;
+            invoice.ClientId = 3;
             invoice.Description = invoiceRequest.Description;
             invoice.UpdatedDate = DateTime.Now;
 
