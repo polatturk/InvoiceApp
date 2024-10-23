@@ -176,16 +176,19 @@ namespace InvoiceApp.Controllers
 
 
         [HttpDelete("{id}")]
-        public bool DeleteInvoice(int id)
+        public IActionResult DeleteInvoice(int id)
         {
-            var invoice = _context.Invoices.Find(id);
-            if (invoice is null)
-                return false;
+            var invoice = _context.Invoices.Include(i => i.Items).FirstOrDefault(i => i.Id == id);
 
+            if (invoice is null)
+                return NotFound();
+
+            // Fatura ile ilişkili tüm işlemleri burada yapabilirsiniz.
             _context.Invoices.Remove(invoice);
             _context.SaveChanges();
 
-            return true;
+            return NoContent(); // 204 No Content: Başarılı bir şekilde silindi ama geri dönecek içerik yok.
         }
+
     }
 }
