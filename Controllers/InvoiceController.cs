@@ -110,7 +110,7 @@ namespace InvoiceApp.Controllers
                 PaymentStatus = invoiceRequest.PaymentStatus,
                 PaymentTerm = (PaymentTerm)invoiceRequest.PaymentTerm,
                 CustomerId = invoiceRequest.CustomerId,
-                ClientId = 3,
+                ClientId = 3, 
                 Description = invoiceRequest.Description
             };
 
@@ -118,9 +118,31 @@ namespace InvoiceApp.Controllers
                 .Where(item => invoiceRequest.ItemIds.Contains(item.Id))
                 .ToList();
 
-            invoice.Items = items;
+            foreach (var item in items)
+            {
+                var index = invoiceRequest.ItemIds.IndexOf(item.Id);
+                var quantityToReduce = invoiceRequest.Quantities[index];
 
-            invoice.TotalAmount = items.Sum(item => item.Price * item.Quantity);
+                if (item.Quantity >= quantityToReduce)
+                {
+                    item.Quantity -= quantityToReduce;
+
+                    invoice.Items.Add(new Item
+                    {
+                        Name = item.Name,
+                        Description = item.Description,
+                        Quantity = quantityToReduce,
+                        Price = item.Price,
+                        Total = item.Price * quantityToReduce 
+                    });
+                }
+                else
+                {
+                    return BadRequest($"Yetersiz miktar: {item.Name} için mevcut miktar: {item.Quantity}, istenen miktar: {quantityToReduce}.");
+                }
+            }
+
+            invoice.TotalAmount = invoice.Items.Sum(i => i.Total);
 
             _context.Invoices.Add(invoice);
             _context.SaveChanges();
@@ -136,14 +158,14 @@ namespace InvoiceApp.Controllers
                     .Where(c => c.Id == invoice.CustomerId)
                     .Select(c => c.FullName)
                     .FirstOrDefault(),
-                Items = items.Select(i => new
+                Items = invoice.Items.Select(i => new
                 {
                     ItemId = i.Id,
                     Name = i.Name,
                     Description = i.Description,
                     Quantity = i.Quantity,
                     Price = i.Price,
-                    Total = i.Price * i.Quantity
+                    Total = i.Total
                 }).ToList(),
                 TotalAmount = invoice.TotalAmount
             };
@@ -151,28 +173,6 @@ namespace InvoiceApp.Controllers
             return CreatedAtAction(nameof(GetInvoice), new { id = invoice.Id }, response);
         }
 
-        [HttpPut]
-        public ActionResult<Invoice> UpdateInvoice([FromBody] DtoInvoiceUpdateRequest invoiceRequest)
-        {
-            var invoice = _context.Invoices
-                .Include(i => i.Items)
-                .FirstOrDefault(i => i.Id == invoiceRequest.Id);
-
-            if (invoice is null)
-                return NotFound();
-
-            invoice.CreatedDate = invoiceRequest.CreatedDate;
-            invoice.PaymentStatus = invoiceRequest.PaymentStatus;
-            invoice.PaymentTerm = (PaymentTerm)invoiceRequest.PaymentTerm;
-            invoice.CustomerId = invoiceRequest.CustomerId;
-            invoice.ClientId = 3;
-            invoice.Description = invoiceRequest.Description;
-            invoice.UpdatedDate = DateTime.Now;
-
-            _context.SaveChanges();
-
-            return Ok(invoice);
-        }
 
 
         [HttpDelete("{id}")]
