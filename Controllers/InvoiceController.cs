@@ -183,11 +183,10 @@ namespace InvoiceApp.Controllers
             if (invoice is null)
                 return NotFound();
 
-            // Fatura ile ilişkili tüm işlemleri burada yapabilirsiniz.
             _context.Invoices.Remove(invoice);
             _context.SaveChanges();
 
-            return NoContent(); // 204 No Content: Başarılı bir şekilde silindi ama geri dönecek içerik yok.
+            return NoContent(); 
         }
 
     }

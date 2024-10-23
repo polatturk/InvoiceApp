@@ -16,21 +16,21 @@ namespace InvoiceApp.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Invoice -> Customer ilişkisinde Cascade Delete
+            // Invoice -> Customer ilişkisi
             modelBuilder.Entity<Invoice>()
                 .HasOne(i => i.Customer)
                 .WithMany(c => c.Invoices)
                 .HasForeignKey(i => i.CustomerId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // Item -> Invoice ilişkisinde Cascade Delete
+            // Item -> Invoice ilişkisi
             modelBuilder.Entity<Item>()
                 .HasOne(i => i.Invoice)
                 .WithMany(inv => inv.Items)
                 .HasForeignKey(i => i.InvoiceId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Client ile Invoice ilişkisi için Cascade Delete
+            // Client ile Invoice ilişkisi 
             modelBuilder.Entity<Invoice>()
                 .HasOne(i => i.Client)
                 .WithMany(c => c.Invoices)
