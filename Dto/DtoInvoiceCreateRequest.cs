@@ -21,5 +21,7 @@ namespace InvoiceApp.Dto
         public string Description { get; set; }
         public int PaymentTerm { get; set; }
         public int CustomerId { get; set; }
+        public List<int> ItemIds { get; set; } = new List<int>();
+        public List<int> Quantities { get; set; } = new List<int>();
     }
 }

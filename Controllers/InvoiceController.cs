@@ -173,6 +173,55 @@ namespace InvoiceApp.Controllers
             return CreatedAtAction(nameof(GetInvoice), new { id = invoice.Id }, response);
         }
 
+        [HttpPut]
+        public ActionResult<object> UpdateInvoice([FromBody] DtoInvoiceUpdateRequest invoiceRequest)
+        {
+            var invoice = _context.Invoices
+                .Include(i => i.Items)
+                .FirstOrDefault(i => i.Id == invoiceRequest.Id);
+
+            if (invoice is null)
+                return NotFound();
+
+            invoice.CreatedDate = invoiceRequest.CreatedDate;
+            invoice.PaymentStatus = invoiceRequest.PaymentStatus;
+            invoice.PaymentTerm = (PaymentTerm)invoiceRequest.PaymentTerm;
+            invoice.CustomerId = invoiceRequest.CustomerId;
+            invoice.Description = invoiceRequest.Description;
+            invoice.UpdatedDate = DateTime.Now;
+
+            for (int i = 0; i < invoice.Items.Count; i++)
+            {
+                var item = invoice.Items[i];
+                var newQuantity = invoiceRequest.Quantities[i];
+                var dbItem = _context.Items.FirstOrDefault(x => x.Id == item.Id);
+
+                if (dbItem != null)
+                {
+                    int quantityDifference = newQuantity - item.Quantity;
+
+                    if (quantityDifference > 0 && dbItem.Quantity >= quantityDifference)
+                    {
+                        dbItem.Quantity -= quantityDifference; 
+                    }
+                    else if (quantityDifference < 0)
+                    {
+                        dbItem.Quantity += Math.Abs(quantityDifference);
+                    }
+                    else if (dbItem.Quantity < quantityDifference)
+                    {
+                        return BadRequest($"Yetersiz stok: {item.Name} için mevcut stok: {dbItem.Quantity}, istenen miktar: {newQuantity}.");
+                    }
+
+                    item.Quantity = newQuantity;
+                    item.Total = item.Quantity * (double)item.Price;
+                }
+            }
+
+            _context.SaveChanges();
+
+            return Ok(invoice);
+        }
 
 
         [HttpDelete("{id}")]

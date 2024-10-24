@@ -70,6 +70,18 @@ namespace InvoiceApp.Controllers
             return Ok(customer);
         }
 
+        [HttpGet("{fullname}")]
+        public ActionResult<IEnumerable<Customer>> GetCustomersByName(string fullname)
+        {
+            var customers = _context.Customers.Where(c => c.FullName.Contains(fullname)).ToList();
+
+            if (!customers.Any())
+                return NotFound();
+
+            return Ok(customers);
+        }
+
+
         [HttpPost]
         public ActionResult<Customer> AddCustomer([FromBody] DtoCustomerCreateRequest customerRequest)
         {
