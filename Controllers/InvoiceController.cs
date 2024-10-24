@@ -61,13 +61,14 @@ namespace InvoiceApp.Controllers
             return Ok(invoices);
         }
 
-
         [HttpGet("{id}")]
         public ActionResult<object> GetInvoice(int id)
         {
             var invoice = _context.Invoices
                 .Include(i => i.Customer)
                 .Include(i => i.Items)
+                .Include(i => i.Client)
+
                 .FirstOrDefault(i => i.Id == id);
 
             if (invoice is null)
@@ -86,6 +87,14 @@ namespace InvoiceApp.Controllers
                 CustomerCity = invoice.Customer.City,
                 CustomerCountry = invoice.Customer.Country,
                 CustomerPostCode = invoice.Customer.PostCode,
+                Client = new
+                {
+                    Name = invoice.Client.Name,
+                    City = invoice.Client.City,
+                    Country = invoice.Client.Country,
+                    PostCode = invoice.Client.PostCode,
+                    Address = invoice.Client.Adress
+                },
                 Items = invoice.Items.Select(item => new
                 {
                     ItemId = item.Id,

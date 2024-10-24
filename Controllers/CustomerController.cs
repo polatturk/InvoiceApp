@@ -88,7 +88,7 @@ namespace InvoiceApp.Controllers
                 City = customerRequest.City,
                 Country = customerRequest.Country,
                 PostCode = customerRequest.PostCode,
-                ClientId = 2
+                ClientId = 3
             };
 
             _context.Customers.Add(customer);
